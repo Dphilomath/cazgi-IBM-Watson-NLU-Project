@@ -18,21 +18,21 @@ return naturalLanguageUnderstanding;
 }
 
 
-const analyzeParams = {
-  'url': 'www.ibm.com',
-  'features': {
-    'entities': {
-      'emotion': true,
-      'sentiment': true,
-      'limit': 2,
-    },
-    'keywords': {
-      'emotion': true,
-      'sentiment': true,
-      'limit': 2,
-    },
-  },
-};
+// const analyzeParams = {
+//   'url': 'www.ibm.com',
+//   'features': {
+//     'entities': {
+//       'emotion': true,
+//       'sentiment': true,
+//       'limit': 2,
+//     },
+//     'keywords': {
+//       'emotion': true,
+//       'sentiment': true,
+//       'limit': 2,
+//     },
+//   },
+// };
 
 // naturalLanguageUnderstanding.analyze(analyzeParams)
 //   .then(analysisResults => {
@@ -52,19 +52,17 @@ app.get("/",(req,res)=>{
   });
 
 app.get("/url/emotion", (req,res) => {
-     let newInstance = getNLUInstance()
+    let newInstance = getNLUInstance()
 
-    let analyzeParams={'url':req.query.url,
-    'features': {
-    'entities': {
-      'emotion': true,
-      'sentiment': true,
-      'limit': 2,
+    let analyzeParams={
+        'url':req.query.url,
+        'features': {
+            "emotion":{}
+        }
     }
-    }}
     newInstance.analyze(analyzeParams)
     .then(analysisResults => {
-    res.json(analysisResults.result.entities[0].emotion)
+    res.json(analysisResults.result.emotion.document.emotion)
   })
   .catch(err => {
     console.log('error:', err);
@@ -74,17 +72,16 @@ app.get("/url/emotion", (req,res) => {
 app.get("/url/sentiment", (req,res) => {
     let newInstance = getNLUInstance()
 
-    let analyzeParams={'url':req.query.url,
-    'features': {
-    'entities': {
-      'sentiment': true,
-      'limit': 2,
-    }
-    }}
+let analyzeParams = {
+  'url': req.query.url,
+  'features': {
+    'sentiment': {}
+  }
+};
     newInstance.analyze(analyzeParams)
     .then(analysisResults => {
-    console.log(analysisResults.result.entities[0].sentiment)
-    return res.send("url sentiment for "+req.query.url +" "+ analysisResults.result.entities[0].sentiment.label);
+    console.log(analysisResults.result)
+    return res.send("url sentiment for "+req.query.url +" "+ analysisResults.result.sentiment.document.label);
   })
   .catch(err => {
     console.log('error:', err);
@@ -97,40 +94,32 @@ app.get("/url/sentiment", (req,res) => {
 app.get("/text/emotion", (req,res) => {
     let newInstance = getNLUInstance()
 
-    let analyzeParams={'text': req.query.text,
+    let analyzeParams={'text':req.query.text,
     'features': {
-        'entities': {
-        'sentiment':true,
-        'emotion':true,
-        'limit':5
-        }
+    'emotion': {}
     }}
     newInstance.analyze(analyzeParams)
     .then(analysisResults => {
-        console.log(analysisResults.result.entities[0])
-        return res.json(analysisResults.result.entities[0].emotion);
+        console.log(analysisResults)
+    res.json(analysisResults.result.emotion.document.emotion)
   })
   .catch(err => {
     console.log('error:', err);
-    res.status(404)
   });
+  // return res.send({"happy":"10","sad":"90"});
 
-    // return res.send({"happy":"10","sad":"90"});
 });
 
+    
 app.get("/text/sentiment", (req,res) => {
     let newInstance = getNLUInstance()
     let analyzeParams={'text': req.query.text,
     'features': {
-        'entities': {
-        'sentiment':true,
-        'limit':5
-        }
+        'sentiment':{}
     }}
     newInstance.analyze(analyzeParams)
     .then(analysisResults => {
-        console.log(analysisResults.result)
-        return res.send("text sentiment for "+req.query.text +" "+ analysisResults.result.entities[0].sentiment.label);
+        return res.send("text sentiment for "+req.query.text +" "+ analysisResults.result.sentiment.document.label);
   })
   .catch(err => {
     console.log('error:', err);
